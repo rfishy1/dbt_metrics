@@ -1,4 +1,4 @@
-{%- macro get_metric_sql(metrics_dictionary, grain, dimensions, secondary_calculations, start_date, end_date, where, date_alias, metric_tree) %}
+{%- macro get_metric_sql(metrics_dictionary, grain, dimensions, secondary_calculations, start_date, end_date, where, date_alias, metric_tree, additional_base_filter) %}
 
 {#- ############
 Most validation occurs in calculate and develop - please reference there for validation
@@ -69,7 +69,8 @@ up the composite metric. -#}
         dimensions_provided=dimensions_provided,
         total_dimension_count=total_dimension_count,
         group_name=group_name,
-        group_values=group_values
+        group_values=group_values,
+        additional_base_filter=additional_base_filter
         ) 
     }}
 
