@@ -1,8 +1,8 @@
-{%- macro gen_aggregate_cte(metrics_dictionary, grain, dimensions, secondary_calculations, start_date, end_date, relevant_periods, calendar_dimensions, total_dimension_count, group_name, group_values) -%}
-    {{ return(adapter.dispatch('gen_aggregate_cte', 'metrics')(metrics_dictionary, grain, dimensions, secondary_calculations, start_date, end_date, relevant_periods, calendar_dimensions, total_dimension_count, group_name, group_values)) }}
+{%- macro gen_aggregate_cte(metrics_dictionary, grain, dimensions, secondary_calculations, start_date, end_date, relevant_periods, calendar_dimensions, total_dimension_count, group_name, group_values, additional_base_filter) -%}
+    {{ return(adapter.dispatch('gen_aggregate_cte', 'metrics')(metrics_dictionary, grain, dimensions, secondary_calculations, start_date, end_date, relevant_periods, calendar_dimensions, total_dimension_count, group_name, group_values, additional_base_filter)) }}
 {%- endmacro -%}
 
-{%- macro default__gen_aggregate_cte(metrics_dictionary, grain, dimensions, secondary_calculations, start_date, end_date, relevant_periods, calendar_dimensions, total_dimension_count, group_name, group_values) %}
+{%- macro default__gen_aggregate_cte(metrics_dictionary, grain, dimensions, secondary_calculations, start_date, end_date, relevant_periods, calendar_dimensions, total_dimension_count, group_name, group_values, additional_base_filter) %}
 
 , {{group_name}}__aggregate as (
     {# This is the most important CTE. Instead of joining all relevant information
@@ -57,7 +57,8 @@
                 calendar_dimensions=calendar_dimensions,
                 total_dimension_count=total_dimension_count,
                 group_name=group_name,
-                group_values=group_values
+                group_values=group_values,
+                additional_base_filter=additional_base_filter
                 )
             }}
     ) as base_query

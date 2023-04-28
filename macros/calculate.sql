@@ -1,9 +1,9 @@
-{% macro calculate(metric_list, grain=none, dimensions=[], secondary_calculations=[], start_date=none, end_date=none, where=none, date_alias=none) %}
-    {{ return(adapter.dispatch('calculate', 'metrics')(metric_list, grain, dimensions, secondary_calculations, start_date, end_date, where, date_alias)) }}
+{% macro calculate(metric_list, grain=none, dimensions=[], secondary_calculations=[], start_date=none, end_date=none, where=none, date_alias=none, base_filter=none, base_filter_field=none) %}
+    {{ return(adapter.dispatch('calculate', 'metrics')(metric_list, grain, dimensions, secondary_calculations, start_date, end_date, where, date_alias, base_filter, base_filter_field)) }}
 {% endmacro %}
 
 
-{% macro default__calculate(metric_list, grain=none, dimensions=[], secondary_calculations=[], start_date=none, end_date=none, where=none, date_alias=none) %}
+{% macro default__calculate(metric_list, grain=none, dimensions=[], secondary_calculations=[], start_date=none, end_date=none, where=none, date_alias=none, base_filter=none, base_filter_field=none) %}
     {#- Need this here, since the actual ref is nested within loops/conditions: -#}
     -- depends on: {{ ref(var('dbt_metrics_calendar_model', 'dbt_metrics_default_calendar')) }}
     
@@ -27,6 +27,14 @@ released. If you have any questions, please join us in the #dbt-core-metrics in 
 
     {#- Here we are creating the metrics dictionary which contains all of the metric information needed for sql gen. -#}
     {%- set metrics_dictionary = metrics.get_metrics_dictionary(metric_tree=metric_tree) -%}
+
+    {%- set additional_base_filter -%}
+    {%- if base_filter -%}
+        {{ base_filter | replace(base_filter_field, "base_model."+base_filter_field) }}
+    {%- else -%}
+
+    {%- endif -%}
+    {%- endset -%}
 
     {#- ############
     VALIDATION - Make sure everything is good!
@@ -69,7 +77,8 @@ released. If you have any questions, please join us in the #dbt-core-metrics in 
         end_date=end_date,
         where=where,
         date_alias=date_alias,
-        metric_tree=metric_tree
+        metric_tree=metric_tree,
+        additional_base_filter=additional_base_filter
     ) %}
 
 ({{ sql }}) metric_subq 

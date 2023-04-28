@@ -1,8 +1,8 @@
-{%- macro gen_filters(model_values, start_date, end_date) -%}
-    {{ return(adapter.dispatch('gen_filters', 'metrics')(model_values, start_date, end_date)) }}
+{%- macro gen_filters(model_values, start_date, end_date, additional_base_filter) -%}
+    {{ return(adapter.dispatch('gen_filters', 'metrics')(model_values, start_date, end_date, additional_base_filter)) }}
 {%- endmacro -%}
 
-{%- macro default__gen_filters(model_values, start_date, end_date) -%}
+{%- macro default__gen_filters(model_values, start_date, end_date, additional_base_filter) -%}
 
     {#- metric start/end dates also applied here to limit incoming data -#}
     {% if start_date or end_date %}
@@ -25,6 +25,9 @@
                 {%- if not loop.first -%} and {% endif %}{{ filter.field }} {{ filter.operator }} {{ filter.value }}
             {% endfor -%}
         )
+        {%- if additional_base_filter %}
+            {{ additional_base_filter }}
+        {%- endif -%}
     {% endif -%}
 
 {%- endmacro -%}
