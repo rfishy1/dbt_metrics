@@ -25,7 +25,7 @@
                 {%- if not loop.first -%} and {% endif %}{{ filter.field }} {{ filter.operator }} {{ filter.value }}
             {% endfor -%}
         )
-        {%- if additional_base_filter -%}
+        {%- if additional_base_filter %}
             {{ additional_base_filter }}
         {%- endif -%}
     {% endif -%}
