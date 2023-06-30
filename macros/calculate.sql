@@ -22,19 +22,31 @@ released. If you have any questions, please join us in the #dbt-core-metrics in 
     {%- if metric_list is not iterable -%}
         {%- set metric_list = [metric_list] -%}
     {%- endif -%}
+    {%- if base_filter_field and base_filter_field is string -%}
+        {%- set base_filter_field = [base_filter_field] -%}
+    {%- endif -%}
 
     {%- set metric_tree = metrics.get_metric_tree(metric_list=metric_list) -%}
 
     {#- Here we are creating the metrics dictionary which contains all of the metric information needed for sql gen. -#}
     {%- set metrics_dictionary = metrics.get_metrics_dictionary(metric_tree=metric_tree) -%}
 
-    {%- set additional_base_filter -%}
-    {%- if base_filter -%}
-        {{ base_filter | replace(base_filter_field, "base_model."+base_filter_field) }}
-    {%- else -%}
+    {% set ns = namespace(base_filter=base_filter) %}
 
+    {%- if base_filter -%}
+        {%- for item in base_filter_field -%}
+            {%- set ns.base_filter -%}
+                {{ ns.base_filter | replace(" "+item, " base_model."+item) }}
+            {%- endset -%}
+        {% endfor %}
     {%- endif -%}
-    {%- endset -%}
+    {% set additional_base_filter %}
+        {%- if base_filter -%}
+            {{ ns.base_filter }}
+        {% else %}
+
+        {% endif %}
+    {%  endset %}
 
     {#- ############
     VALIDATION - Make sure everything is good!
